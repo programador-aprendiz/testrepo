@@ -9,8 +9,30 @@
 </head>
 
 <body>
+    <div id="start-screen" class="start-screen">
+        <div class="start-card">
+            <h2>Bem-vindo!</h2>
+            <p>Escolha a dificuldade para começar:</p>
+            <div class="difficulty-group">
+                <label><input type="radio" name="difficulty" value="easy"> Fácil (8 tentativas)</label>
+                <label><input type="radio" name="difficulty" value="medium" checked> Médio (6 tentativas)</label>
+                <label><input type="radio" name="difficulty" value="hard"> Difícil (4 tentativas)</label>
+            </div>
+            <button id="start-btn" class="start-btn">Começar</button>
+        </div>
+    </div>
+
     <div class="container">
         <h1>Termo Clone</h1>
+
+        <div class="topbar">
+            <div class="stats">
+                <span id="win-percent">Vitórias: 0%</span>
+                <span class="separator">•</span>
+                <span id="losses-count">Derrotas: 0</span>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">🌙</button>
+        </div>
 
         <div class="game-container">
             <div id="board" class="board"></div>

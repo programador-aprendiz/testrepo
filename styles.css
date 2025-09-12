@@ -17,6 +17,33 @@ body {
     padding: 20px;
 }
 
+.container .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.topbar .stats {
+    display: flex;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.topbar .stats .separator {
+    opacity: 0.6;
+}
+
+.theme-toggle {
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 16px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
 h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
@@ -217,6 +244,86 @@ h1 {
 
 .align-center-flex {
     align-items: center;
+}
+
+/* Dark mode */
+body.dark {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark h1 {
+    color: #e0e0e0;
+}
+
+body.dark .topbar .stats { color: #c4c4c4; }
+body.dark .theme-toggle { background: #1f1f1f; color: #e0e0e0; border-color: #333; }
+
+body.dark .cell {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark .cell.active::after {
+    background-color: #e0e0e0;
+}
+
+body.dark .message { color: #81c784; }
+body.dark .used-letters { color: #b0b0b0; }
+
+body.dark .modal-content {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark .close { color: #bbb; }
+body.dark .close:hover { color: #fff; }
+
+/* Start screen */
+.start-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.start-card {
+    background: #ffffff;
+    color: #333;
+    padding: 24px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+.difficulty-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0 18px;
+    text-align: left;
+}
+
+.start-btn {
+    background: #6aaa64;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Dark mode adjustments for start screen */
+body.dark .start-card {
+    background: #1e1e1e;
+    color: #e0e0e0;
 }
 
 @media (max-width: 500px) {

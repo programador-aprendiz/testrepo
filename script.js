@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpBtn = document.getElementById('help-btn');
     const helpModal = document.getElementById('help-modal');
     const closeBtn = document.querySelector('.close');
+    const winPercentEl = document.getElementById('win-percent');
+    const lossesCountEl = document.getElementById('losses-count');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const containerEl = document.querySelector('.container');
 
     // Variáveis do jogo
     let targetWord = '';
@@ -22,6 +28,78 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = false;
     let usedLetters = new Set();
     let activeCell = null;
+
+    // Dificuldade
+    const difficultyToAttempts = { easy: 8, medium: 6, hard: 4 };
+    let difficulty = 'medium';
+    let maxAttempts = difficultyToAttempts[difficulty];
+
+    function loadDifficulty() {
+        const stored = localStorage.getItem('difficulty');
+        if (stored && difficultyToAttempts[stored]) {
+            difficulty = stored;
+        }
+        maxAttempts = difficultyToAttempts[difficulty];
+        // marcar radio
+        const radio = document.querySelector(`input[name="difficulty"][value="${difficulty}"]`);
+        if (radio) radio.checked = true;
+    }
+
+    function setDifficultyFromSelection() {
+        const selected = document.querySelector('input[name="difficulty"]:checked');
+        const value = selected ? selected.value : 'medium';
+        difficulty = difficultyToAttempts[value] ? value : 'medium';
+        maxAttempts = difficultyToAttempts[difficulty];
+        localStorage.setItem('difficulty', difficulty);
+    }
+
+    // Estatísticas
+    let wins = 0;
+    let losses = 0;
+
+    function loadStats() {
+        const storedWins = parseInt(localStorage.getItem('wins') || '0', 10);
+        const storedLosses = parseInt(localStorage.getItem('losses') || '0', 10);
+        wins = isNaN(storedWins) ? 0 : storedWins;
+        losses = isNaN(storedLosses) ? 0 : storedLosses;
+        updateStatsUI();
+    }
+
+    function saveStats() {
+        localStorage.setItem('wins', String(wins));
+        localStorage.setItem('losses', String(losses));
+    }
+
+    function updateStatsUI() {
+        const total = wins + losses;
+        const percent = total > 0 ? Math.round((wins / total) * 100) : 0;
+        if (winPercentEl) winPercentEl.textContent = `Vitórias: ${percent}%`;
+        if (lossesCountEl) lossesCountEl.textContent = `Derrotas: ${losses}`;
+    }
+
+    function incrementWin() {
+        wins++;
+        saveStats();
+        updateStatsUI();
+    }
+
+    function incrementLoss() {
+        losses++;
+        saveStats();
+        updateStatsUI();
+    }
+
+    // Tema
+    function applyTheme(theme) {
+        const isDark = theme === 'dark';
+        document.body.classList.toggle('dark', isDark);
+        if (themeToggleBtn) themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function loadTheme() {
+        const theme = localStorage.getItem('theme') || 'light';
+        applyTheme(theme);
+    }
 
     // Inicializar o jogo
     function initGame() {
@@ -39,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Criar tabuleiro
         board.innerHTML = '';
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < maxAttempts; i++) {
             const row = document.createElement('div');
             row.className = 'row';
             row.dataset.row = i;
@@ -78,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Definir primeira célula como ativa
         activeCell = document.querySelector('.cell');
-        activeCell.classList.add('active');
+        if (activeCell) activeCell.classList.add('active');
     }
 
     // Manipular pressionamento de tecla
@@ -186,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verificar vitória
         if (guess === targetWord) {
             message.textContent = "Acertou!";
+            incrementWin();
             gameOver = true;
             setTimeout(() => {
                 initGame();
@@ -198,14 +277,15 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCell = 0;
 
         // Definir primeira célula da nova linha como ativa
-        if (currentRow < 6) {
+        if (currentRow < maxAttempts) {
             activeCell = document.querySelector(`.row[data-row="${currentRow}"] .cell`);
-            activeCell.classList.add('active');
+            if (activeCell) activeCell.classList.add('active');
         }
 
         // Verificar fim de jogo
-        if (currentRow === 6) {
+        if (currentRow === maxAttempts) {
             message.textContent = `Tente novamente! A palavra era ${targetWord}`;
+            incrementLoss();
             gameOver = true;
             setTimeout(() => {
                 initGame();
@@ -252,6 +332,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Iniciar o jogo
-    initGame();
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark');
+            const next = isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            applyTheme(next);
+        });
+    }
+
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            setDifficultyFromSelection();
+            if (startScreen) startScreen.style.display = 'none';
+            if (containerEl) containerEl.style.display = '';
+            initGame();
+        });
+    }
+
+    // Iniciar: carregar estado e mostrar tela inicial
+    loadStats();
+    loadTheme();
+    loadDifficulty();
+    if (containerEl) containerEl.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'flex';
 });
